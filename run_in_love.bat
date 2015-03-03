@@ -1,2 +1,2 @@
-"C:\Program Files (x86)\LOVE\love.exe" D:\lib2\BTEditor --console
+"C:\Program Files (x86)\LOVE\love.exe" D:\code2\BTEditor --console
 

@@ -270,7 +270,7 @@ function readScreenMode(pfile,picon)
   if love.filesystem.exists(pfile) then
     local _config = love.filesystem.read(pfile)
     if (_config) then
-      local screenconfig =  json.decode(_config)
+      local screenconfig =  json:decode(_config)
       if screenconfig then
         changeScreenMode(screenconfig,picon)
       end
@@ -283,7 +283,7 @@ function saveScreenMode(pfile)
   _table = {}
   _table.width, _table.height, _table.fullscreen,_table.vsync, _table.fsaa = love.graphics.getMode( )
   if pfile then
-    return love.filesystem.write(pfile,json.encode(_table))
+    return love.filesystem.write(pfile,json:encode(_table))
   else
     return false
   end

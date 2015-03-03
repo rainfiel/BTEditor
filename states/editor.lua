@@ -1468,7 +1468,7 @@ function state.saveFile()
   local tree = state.serializeTree(false)
   local treeser
   if string.ends(string.upper(EDITOR.filename),".JSON") then
-    treeser = json.encode(tree)
+    treeser = json:encode_pretty(tree)
   else
     treeser = DataDumper(tree)
   end
@@ -1516,7 +1516,7 @@ function state.loadFile()
     return false
   end
   if string.ends(string.upper(EDITOR.filename),".JSON") then
-    tree = json.decode(treeser)
+    tree = json:decode(treeser)
   else
     tree = loadstring(treeser)()
   end
@@ -1629,7 +1629,7 @@ function state.addFileToHistory(pfilename)
   end
   if _found==false then
     table.insert(EDITOR.fileHistory,pfilename)
-    love.filesystem.write("filehistory.txt",json.encode(EDITOR.fileHistory))
+    love.filesystem.write("filehistory.txt",json:encode(EDITOR.fileHistory))
   end
 end
 
@@ -1639,7 +1639,7 @@ function state.readFileHistory()
   else
     local _filehistory = love.filesystem.read("filehistory.txt")
     if (_filehistory) then
-      EDITOR.fileHistory =  json.decode(_filehistory)
+      EDITOR.fileHistory =  json:decode(_filehistory)
     end
   end
 end
