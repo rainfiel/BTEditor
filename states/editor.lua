@@ -188,7 +188,7 @@ function state:enter(pre, action, level,  ...)
   tooltip:SetPadding(0)
   tooltip:SetOffsets(-50,30)
   tooltip:SetText("Simulation Window")
- 
+
   object = loveframes.Create("text")
   object:SetMaxWidth(32)
   object:SetText(" ")
@@ -1940,13 +1940,17 @@ end
 
 function state:runSimulation(pStepByStep)
   if pStepByStep==false or EDITOR.btlua == nil or EDITOR.btlua.runner == nil or coroutine.status(EDITOR.btlua.runner) == "dead" then
-    EDITOR.btlua = BTLua.BTree:new(EDITOR.gui.txt_title:GetText(),nil,nil)
-    _tree = state:serializeTree(true)
-    local _status, _err = pcall(EDITOR.btlua.parseTable,EDITOR.btlua,nil,_tree,{"id"})
-    if _status==false then
-      state.createDialog(state.funcnil,"alert2","Error during parse of tree:\n".._err)
-      EDITOR.btlua = nil
-      return false
+    if not EDITOR.btlua then
+      print(".............create new tree")
+      EDITOR.btlua = BTLua.BTree:new(EDITOR.gui.txt_title:GetText(),nil,nil)
+
+      _tree = state:serializeTree(true)
+      local _status, _err = pcall(EDITOR.btlua.parseTable,EDITOR.btlua,nil,_tree,{"id"})
+      if _status==false then
+        state.createDialog(state.funcnil,"alert2","Error during parse of tree:\n".._err)
+        EDITOR.btlua = nil
+        return false
+      end
     end
     --print(Inspector(EDITOR.btlua))
     --print(Inspector(_tree))
