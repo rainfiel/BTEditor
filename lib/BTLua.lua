@@ -56,6 +56,48 @@ function BTLua.node:new(...)
  _o:init(...)
  return _o
 end
+--------------- CONTINUE ----------------
+BTLua.Continue = inheritsFrom(BTLua.node)
+function BTLua.Continue:init(...)
+  self.s = ""
+  self.n = -1
+  self.c = {}
+  local arg = { ... }
+  for i,v in ipairs(arg) do
+    table.insert(self.c,v)
+  end
+end
+function BTLua.Continue:run(pbehavtree)
+  --debugprint("BTLua.Sequence:run")
+  if pbehavtree.startNode then pbehavtree.startNode(pbehavtree,self) end
+  local _s, _child
+  local _ticknum = pbehavtree.ticknum
+  -- children loop
+  for i=1,#self.c do
+    _child = self.c[i]
+    --debugprint("BTLua.Sequence:run "..i)
+    -- if I was Running then I'll launch only childs Running or  not yet launched
+    if self.s == "Running" and self.n == _ticknum-1 and _child.s~="Running" and _child.n == _ticknum-1 then
+      _s = _child.s
+    else
+      _s = _child:run(pbehavtree)
+    end
+    -- stop execution on first false or running (sequence loops children on true return)
+    if _s==false or _s=="Running" then
+      --debugprint("BTLua.Sequence ends2")
+      --debugprint(_s)
+      if _s==false then _s = true end
+      self.n,self.s = _ticknum, _s
+      if pbehavtree.endNode then pbehavtree.endNode(pbehavtree,self) end
+      return _s
+    end
+  end
+  --debugprint("BTLua.Sequence ends")
+  --debugprint(_s)
+  self.n,self.s = _ticknum, _s
+  if pbehavtree.endNode then pbehavtree.endNode(pbehavtree,self) end
+  return _s
+end
 --------------- SEQUENCE ----------------
 BTLua.Sequence = inheritsFrom(BTLua.node)
 function BTLua.Sequence:init(...)
@@ -868,6 +910,9 @@ function BTLua.BTree:parseNode(pnode,pattributes)
   end
   if _type =="SLEEP" then
     _node =  BTLua.Sleep(unpack(_func))
+  end
+  if _type == "CONTINUE" then
+    _node = BTLua.Continue:new()
   end
   if _node==nil then
     error("BTLua : node type '"..pnode.type.."' unrecognized!")
